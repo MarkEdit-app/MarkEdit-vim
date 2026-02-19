@@ -41,7 +41,7 @@ const applyMappings = (mappings: any) => {
 
 (async () => {
   // From userSettings (settings.json)
-  applyMappings(MarkEdit.userSettings['vim.mappings']);
+  applyMappings(MarkEdit.userSettings['extension.markeditVim']?.mappings);
 
   // From markedit-vim.json
   const documents = MarkEdit.getDirectoryPath('documents');

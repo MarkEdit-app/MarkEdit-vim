@@ -14,14 +14,16 @@ You can also run `yarn install && yarn build` to build and deploy the script.
 
 You can define custom key mappings in two ways:
 
-1.  Add `vim.mappings` to `~/Library/Containers/app.cyan.markedit/Data/Documents/settings.json`:
+1.  Add `extension.markeditVim` to `~/Library/Containers/app.cyan.markedit/Data/Documents/settings.json`:
 
     ```json
     {
-      "vim.mappings": [
-        { "before": "jj", "after": "<Esc>", "mode": "insert" },
-        { "before": "Y", "after": "y$" }
-      ]
+      "extension.markeditVim": {
+        "mappings": [
+          { "before": "jj", "after": "<Esc>", "mode": "insert" },
+          { "before": "Y", "after": "y$" }
+        ]
+      }
     }
     ```
 
