@@ -1,6 +1,6 @@
 import { EditorView } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
-import { vim, Vim } from '@replit/codemirror-vim';
+import { vim, Vim, getCM } from '@replit/codemirror-vim';
 import { MarkEdit } from 'markedit-api';
 
 const theme = EditorView.baseTheme({
@@ -19,15 +19,6 @@ MarkEdit.addExtension([
   Prec.highest(vim({ status: true })),
 ]);
 
-/**
- * Apply custom key mappings from an array.
- *
- * Example:
- * [
- *   { "before": "jj", "after": "<Esc>", "mode": "insert" },
- *   { "before": "Y", "after": "y$" }
- * ]
- */
 const applyMappings = (mappings: any) => {
   if (Array.isArray(mappings)) {
     mappings.forEach(mapping => {
@@ -39,11 +30,27 @@ const applyMappings = (mappings: any) => {
   }
 };
 
-(async () => {
-  // From userSettings (settings.json)
-  applyMappings(MarkEdit.userSettings['extension.markeditVim']?.mappings);
+const applyDefaultMode = (defaultMode: string) => {
+  if (defaultMode === 'insert') {
+    MarkEdit.onEditorReady((view) => {
+      const cm = getCM(view);
+      if (cm) {
+        Vim.handleKey(cm, 'a', 'map');
+      }
+    });
+  }
+};
 
-  // From markedit-vim.json
+(async () => {
+  const userSettings = MarkEdit.userSettings['extension.markeditVim'] as any;
+
+  if (userSettings) {
+    applyMappings(userSettings.mappings);
+    if (userSettings.defaultMode) {
+      applyDefaultMode(userSettings.defaultMode);
+    }
+  }
+
   const documents = MarkEdit.getDirectoryPath('documents');
   const configPath = `${documents}/scripts/markedit-vim.json`;
   const content = await MarkEdit.getFileContent(configPath);
@@ -52,23 +59,25 @@ const applyMappings = (mappings: any) => {
     try {
       const config = JSON.parse(content);
       applyMappings(config.mappings);
+      if (config.defaultMode) {
+        applyDefaultMode(config.defaultMode);
+      }
     } catch (e) {
       console.error('Failed to parse markedit-vim.json', e);
     }
   }
 })();
 
-// Work around a Safari bug where status label is duplicate
-MarkEdit.onEditorReady(({ dom }) => {
-  const panel = dom.querySelector('.cm-panels-bottom');
+MarkEdit.onEditorReady((view) => {
+  const panel = view.scrollDOM.querySelector('.cm-panels-bottom');
   if (panel === null) {
     return;
   }
 
   const observer = new MutationObserver(() => {
-    const span = Array.from(panel.querySelectorAll('span')).find(span => span.style.top === '1px');
+    const span = Array.from(panel.querySelectorAll('span')).find((span: Element) => (span as HTMLElement).style.top === '1px');
     if (span) {
-      span.style.display = 'none';
+      (span as HTMLElement).style.display = 'none';
     }
   });
 

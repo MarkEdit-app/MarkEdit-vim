@@ -10,6 +10,30 @@ Copy [dist/markedit-vim.js](dist/markedit-vim.js?raw=true) to `~/Library/Contain
 
 You can also run `yarn install && yarn build` to build and deploy the script.
 
+## Default Mode
+
+You can configure the default vim mode when opening a file. By default, it starts in normal mode. To start in insert mode instead:
+
+1. Add `extension.markeditVim` to `~/Library/Containers/app.cyan.markedit/Data/Documents/settings.json`:
+
+    ```json
+    {
+      "extension.markeditVim": {
+        "defaultMode": "insert"
+      }
+    }
+    ```
+
+2. Or create `~/Library/Containers/app.cyan.markedit/Data/Documents/scripts/markedit-vim.json` alongside the extension:
+
+    ```json
+    {
+      "defaultMode": "insert"
+    }
+    ```
+
+Available modes: `normal`, `insert`.
+
 ## Custom Mappings
 
 You can define custom key mappings in two ways:
