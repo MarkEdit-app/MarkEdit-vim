@@ -1,6 +1,6 @@
 # MarkEdit-vim
 
-Vim Keybindings for MarkEdit that leverages [markedit-api](https://github.com/MarkEdit-app/MarkEdit-api).
+Vim Keybindings for [MarkEdit](https://github.com/MarkEdit-app/MarkEdit) that leverages [markedit-api](https://github.com/MarkEdit-app/MarkEdit-api).
 
 Learn more about [codemirror-vim](https://github.com/replit/codemirror-vim).
 
