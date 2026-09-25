@@ -19,6 +19,24 @@ MarkEdit.addExtension([
   Prec.highest(vim({ status: true })),
 ]);
 
+// codemirror-vim ships :w as a stub, save via the same action as File → Save
+Vim.defineEx('write', 'w', () => {
+  MarkEdit.saveDocument();
+});
+
+const saveAndClose = async () => {
+  // Unsaved drafts have no file info, saveDocument returns before the save panel completes,
+  // closing now would race with it, so only save and let the user close afterwards.
+  const isDraft = await MarkEdit.getFileInfo() === undefined;
+  await MarkEdit.saveDocument();
+  if (!isDraft) {
+    MarkEdit.closeDocument();
+  }
+};
+
+Vim.defineEx('wq', 'wq', saveAndClose);
+Vim.defineEx('xit', 'x', saveAndClose);
+
 /**
  * Apply custom key mappings from an array.
  *
@@ -41,7 +59,7 @@ const applyMappings = (mappings: any) => {
 
 (async () => {
   // From userSettings (settings.json)
-  applyMappings(MarkEdit.userSettings['extension.markeditVim']?.mappings);
+  applyMappings((MarkEdit.userSettings['extension.markeditVim'] as any)?.mappings);
 
   // From markedit-vim.json
   const documents = MarkEdit.getDirectoryPath('documents');
